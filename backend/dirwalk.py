@@ -10,10 +10,10 @@ except:
     dirs = '.'
 
 re_file_type_pre  = re.compile("\.[Cc][Bb][RrZz]$")
-re_file_type_post = re.compile("\.(cbr|cbz|CBR|CBZ)$")
+re_file_type_post = re.compile("\.([Cc][Bb][RrZz])$")
 
-re_year_pre = re.compile("\(\d{4}\)")
-re_year_post = re.compile("\((\d{4})\)")
+re_year_pre  = re.compile("\(?\d{4}\)?")
+re_year_post = re.compile("\(?(\d{4})\)?")
 
 # TODO fix for ##.# issues
 re_issue_pre  = re.compile("#?[^\w]\d{1,3}(?:\.\d)?(?:[^\d]|$)")
@@ -22,8 +22,8 @@ re_issue_post = re.compile("#?[^\w](\d{1,3}(?:\.\d)?)(?:[^\d]|$)")
 re_tot_issues_pre  = re.compile("\([oO][fF][ _]\d{1,2}\)")
 re_tot_issues_post = re.compile("\([oO][fF][ _](\d{1,2})\)")
 
-re_vol_pre  = re.compile("v\d{1}")
-re_vol_post = re.compile("v(\d{1})")
+re_vol_pre  = re.compile("(?:v|Volume |Vol[. ])(?:\d{1,4})")
+re_vol_post = re.compile("(?:v|Volume |Vol[. ])(\d{1,4})")
 
 re_crap_pre  = re.compile("(?:\(.*\)(?:\s|$)?)+")
 re_crap_post = re.compile("(\(.*\)(?:\s|$)?)+")
@@ -62,7 +62,7 @@ def get_file_info(filename):
         if val is not None:
             left_to_parse = remove_str(left_to_parse,val) # remove section from filename
             val = get_reg(parsers[p][1], val)
-            info[p] = val.strip() #remove any leading/trailing spaces. Easier here than in regex
+            info[p] = val.strip() # remove any leading/trailing spaces. Easier here than in regex
     # print(left_to_parse)
     return info
 
@@ -70,5 +70,7 @@ for root,subs,files in os.walk(dirs):
     for file in files:
         if file.lower().endswith("cbr") or file.lower().endswith("cbz"):
             print(root + "/" + file)
-            print(get_file_info(file))
+            info = get_file_info(file)
+            #print(info)
+            print(info['title'])
 
