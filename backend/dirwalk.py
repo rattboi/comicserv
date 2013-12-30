@@ -25,15 +25,19 @@ re_tot_issues_post = re.compile("\([oO][fF][ _](\d{1,2})\)")
 re_vol_pre  = re.compile("v\d{1}")
 re_vol_post = re.compile("v(\d{1})")
 
-re_crap_pre = re.compile("(?:\(.*\)(?:\s|$)?)+")
+re_crap_pre  = re.compile("(?:\(.*\)(?:\s|$)?)+")
 re_crap_post = re.compile("(\(.*\)(?:\s|$)?)+")
 
-parsers = OrderedDict((("Type :", (re_file_type_pre,re_file_type_post)),
-                       ("Vol  :", (re_vol_pre, re_vol_post)),
-                       ("Year :", (re_year_pre, re_year_post)),
-                       ("Total:", (re_tot_issues_pre,re_tot_issues_post)),
-                       ("Issue:", (re_issue_pre, re_issue_post)),
-                       ("Crap :", (re_crap_pre, re_crap_post))))
+re_title_pre  = re.compile(".*")
+re_title_post = re.compile("(.*)")
+
+parsers = OrderedDict((("type",   (re_file_type_pre,re_file_type_post)),
+                       ("vol",    (re_vol_pre, re_vol_post)),
+                       ("year",   (re_year_pre, re_year_post)),
+                       ("num_iss",(re_tot_issues_pre,re_tot_issues_post)),
+                       ("issue",  (re_issue_pre, re_issue_post)),
+                       ("crap",   (re_crap_pre, re_crap_post)),
+                       ("title",  (re_title_pre, re_title_post))))
 
 def get_reg(reg, file):
     r_all = reg.findall(file)
@@ -50,7 +54,7 @@ def remove_str(orig, sub):
     f_len = len(sub)
     return orig[0:f] + orig[f+f_len:]
 
-def get_info(filename):
+def get_file_info(filename):
     left_to_parse = filename.replace('_',' ')
     info = {}
     for p in parsers.keys():
@@ -58,11 +62,13 @@ def get_info(filename):
         if val is not None:
             left_to_parse = remove_str(left_to_parse,val) # remove section from filename
             val = get_reg(parsers[p][1], val)
-            print(p + val)
-    print(left_to_parse)
+            info[p] = val.strip() #remove any leading/trailing spaces. Easier here than in regex
+    # print(left_to_parse)
+    return info
 
 for root,subs,files in os.walk(dirs):
     for file in files:
         if file.lower().endswith("cbr") or file.lower().endswith("cbz"):
             print(root + "/" + file)
-            get_info(file)
+            print(get_file_info(file))
+
