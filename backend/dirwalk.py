@@ -25,11 +25,15 @@ re_tot_issues_post = re.compile("\([oO][fF][ _](\d{1,2})\)")
 re_vol_pre  = re.compile("v\d{1}")
 re_vol_post = re.compile("v(\d{1})")
 
+re_crap_pre = re.compile("(?:\(.*\)(?:\s|$)?)+")
+re_crap_post = re.compile("(\(.*\)(?:\s|$)?)+")
+
 parsers = OrderedDict((("Type :", (re_file_type_pre,re_file_type_post)),
                        ("Vol  :", (re_vol_pre, re_vol_post)),
                        ("Year :", (re_year_pre, re_year_post)),
                        ("Total:", (re_tot_issues_pre,re_tot_issues_post)),
-                       ("Issue:", (re_issue_pre, re_issue_post))))
+                       ("Issue:", (re_issue_pre, re_issue_post)),
+                       ("Crap :", (re_crap_pre, re_crap_post))))
 
 def get_reg(reg, file):
     r_all = reg.findall(file)
