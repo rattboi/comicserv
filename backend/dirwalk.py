@@ -28,16 +28,20 @@ re_vol_post = re.compile("(?:v|Volume |Vol[. ])(\d{1,4})")
 re_crap_pre  = re.compile("(?:\(.*\)(?:\s|$)?)+")
 re_crap_post = re.compile("(\(.*\)(?:\s|$)?)+")
 
+re_crap2_pre  = re.compile("\|(?:.*)$")
+re_crap2_post = re.compile("(\|.*$)")
+
 re_title_pre  = re.compile(".*")
 re_title_post = re.compile("(.*)")
 
-parsers = OrderedDict((("type",   (re_file_type_pre,re_file_type_post)),
-                       ("vol",    (re_vol_pre, re_vol_post)),
-                       ("year",   (re_year_pre, re_year_post)),
-                       ("num_iss",(re_tot_issues_pre,re_tot_issues_post)),
-                       ("issue",  (re_issue_pre, re_issue_post)),
-                       ("crap",   (re_crap_pre, re_crap_post)),
-                       ("title",  (re_title_pre, re_title_post))))
+parsers = OrderedDict((("type",   (re_file_type_pre,re_file_type_post,'')),
+                       ("vol",    (re_vol_pre, re_vol_post,'|')),
+                       ("year",   (re_year_pre, re_year_post,'|')),
+                       ("num_iss",(re_tot_issues_pre,re_tot_issues_post,'')),
+                       ("issue",  (re_issue_pre, re_issue_post,'')),
+                       ("crap",   (re_crap_pre, re_crap_post,'|')),
+                       ("crap2",  (re_crap2_pre, re_crap2_post,'')),
+                       ("title",  (re_title_pre, re_title_post,''))))
 
 def get_reg(reg, file):
     r_all = reg.findall(file)
@@ -47,20 +51,13 @@ def get_reg(reg, file):
         r = None
     return r
 
-def remove_str(orig, sub):
-    f = orig.find(sub)
-    if f == -1:
-        return orig
-    f_len = len(sub)
-    return orig[0:f] + orig[f+f_len:]
-
 def get_file_info(filename):
     left_to_parse = filename.replace('_',' ')
     info = {}
     for p in parsers.keys():
         val = get_reg(parsers[p][0], left_to_parse)
         if val is not None:
-            left_to_parse = remove_str(left_to_parse,val) # remove section from filename
+            left_to_parse = left_to_parse.replace(val,parsers[p][2])
             val = get_reg(parsers[p][1], val)
             info[p] = val.strip() # remove any leading/trailing spaces. Easier here than in regex
     # print(left_to_parse)
@@ -71,6 +68,6 @@ for root,subs,files in os.walk(dirs):
         if file.lower().endswith("cbr") or file.lower().endswith("cbz"):
             print(root + "/" + file)
             info = get_file_info(file)
-            #print(info)
-            print(info['title'])
+            print(info)
+            #print(info['title'])
 
