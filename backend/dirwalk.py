@@ -15,7 +15,6 @@ re_file_type_post = re.compile("\.([Cc][Bb][RrZz])$")
 re_year_pre  = re.compile("\(?\d{4}\)?")
 re_year_post = re.compile("\(?(\d{4})\)?")
 
-# TODO fix for ##.# issues
 re_issue_pre  = re.compile("#?[^\w]\d{1,3}(?:\.\d)?(?:[^\d]|$)")
 re_issue_post = re.compile("#?[^\w](\d{1,3}(?:\.\d)?)(?:[^\d]|$)")
 
@@ -29,10 +28,10 @@ re_crap_pre  = re.compile("(?:\(.*\)(?:\s|$)?)+")
 re_crap_post = re.compile("(\(.*\)(?:\s|$)?)+")
 
 re_crap2_pre  = re.compile("\|(?:.*)$")
-re_crap2_post = re.compile("(\|.*$)")
+re_crap2_post = re.compile("\|(?:[\|\s]*)(.*$)")
 
 re_title_pre  = re.compile(".*")
-re_title_post = re.compile("(.*)")
+re_title_post = re.compile("^(.*?)[-\s]*$")
 
 parsers = OrderedDict((("type",   (re_file_type_pre,re_file_type_post,'')),
                        ("vol",    (re_vol_pre, re_vol_post,'|')),
@@ -66,7 +65,7 @@ def get_file_info(filename):
 for root,subs,files in os.walk(dirs):
     for file in files:
         if file.lower().endswith("cbr") or file.lower().endswith("cbz"):
-            print(root + "/" + file)
+            #print(root + "/" + file)
             info = get_file_info(file)
             print(info)
             #print(info['title'])
