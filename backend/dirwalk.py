@@ -30,8 +30,8 @@ re_crap_post = re.compile("(\(.*\)(?:\s|$)?)+")
 re_crap2_pre  = re.compile("\|(?:.*)$")
 re_crap2_post = re.compile("\|(?:[\|\s]*)(.*$)")
 
-re_title_pre  = re.compile(".*")
-re_title_post = re.compile("^(.*?)[-\s]*$")
+re_series_pre  = re.compile(".*")
+re_series_post = re.compile("^(.*?)[-\s]*$")
 
 parsers = OrderedDict((("type",   (re_file_type_pre,re_file_type_post,'')),
                        ("vol",    (re_vol_pre, re_vol_post,'|')),
@@ -40,7 +40,13 @@ parsers = OrderedDict((("type",   (re_file_type_pre,re_file_type_post,'')),
                        ("issue",  (re_issue_pre, re_issue_post,'')),
                        ("crap",   (re_crap_pre, re_crap_post,'|')),
                        ("crap2",  (re_crap2_pre, re_crap2_post,'')),
-                       ("title",  (re_title_pre, re_title_post,''))))
+                       ("series",  (re_series_pre, re_series_post,''))))
+
+def setup(fn):
+     url_conn = sqlite.connect(fn)
+     cursor = url_conn.cursor()
+     cursor.execute('CREATE TABLE IF NOT EXISTS comicbooks (id INTEGER PRIMARY KEY, series VARCHAR(50), volume VARCHAR(10), issue VARCHAR(10), year INTEGER, hash CHAR(32), summary VARCHAR(200), path VARCHAR(200))')
+     url_conn.commit()
 
 def get_reg(reg, file):
     r_all = reg.findall(file)
@@ -68,5 +74,5 @@ for root,subs,files in os.walk(dirs):
             #print(root + "/" + file)
             info = get_file_info(file)
             print(info)
-            #print(info['title'])
+            #print(info['series'])
 
